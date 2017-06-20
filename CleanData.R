@@ -10,14 +10,38 @@ if (!"RAW_Data.zip" %in% files){
   download.file(url, "RAW_Data.zip", method)
 }
 unzip("RAW_Data.zip")
-
-header <- as.list(strsplit(readChar("UCI HAR Dataset/features.txt", file.info("features.txt")$size), ' ')[[1]])
-header <-header[2:length(header)]
+#Set headers and 
+header <- as.list(strsplit(readChar("UCI HAR Dataset/features.txt", file.info("UCI HAR Dataset/features.txt")$size), ' ')[[1]])
+header <- c("Subject", "Activity", header[2:length(header)])
 for(i in seq(1:length(header))){
   header[i] <- sub("\\n[0-9]*", '', header[i])
 }
 
+activity <- c("WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS", "SITTING", "STANDING", "LAYING")
+
+#Merges test and train data and assigns header
 test_data <- read.table("UCI HAR Dataset/test/X_test.txt")
+test_sub <- read.table("UCI HAR Dataset/test/subject_test.txt")
+test_activity <- read.table("UCI HAR Dataset/test/y_test.txt") 
+test_data <-cbind(test_sub, test_activity, test_data)
 train_data <- read.table("UCI HAR Dataset/train/X_train.txt")
+train_sub <- read.table("UCI HAR Dataset/train/subject_train.txt")
+train_activity <- read.table("UCI HAR Dataset/train/y_train.txt") 
+train_data <-cbind(train_sub, train_activity, train_data)
 all_data <- rbind(test_data, train_data)
 names(all_data) <- header
+for(i in seq(1, length(all_data$Activity))){
+    x[i] <- activity[all_data$Activity[i]]
+}
+all_data$Activity <- x
+#Subset data to only include  columns containing mean and standard deviation 
+sub_header <- c("Subject")
+for(i in header){
+  if(grepl("mean()", i) | grepl("std()", i)){
+    sub_header <- c(sub_header, i)
+  }
+}
+mean_std_data <- all_data[,sub_header]
+
+
+
