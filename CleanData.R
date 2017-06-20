@@ -30,10 +30,12 @@ train_activity <- read.table("UCI HAR Dataset/train/y_train.txt")
 train_data <-cbind(train_sub, train_activity, train_data)
 all_data <- rbind(test_data, train_data)
 names(all_data) <- header
-for(i in seq(1, length(all_data$Activity))){
-    x[i] <- activity[all_data$Activity[i]]
+activity_names <- as.data.frame(all_data$Activity, optional = FALSE)
+for(i in seq(1, length(activity_names))){
+    activity_names[i] <- activity[all_data$Activity[i]]
 }
-all_data$Activity <- x
+all_data$Activity <- data.frame(activity_names)
+names(all_data[2]) <- header[2]
 #Subset data to only include  columns containing mean and standard deviation 
 sub_header <- c("Subject")
 for(i in header){
