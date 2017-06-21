@@ -53,7 +53,7 @@ mean_std_data <- all_data[,sub_header]
 #Average data for each activity and subject
 subjects <- sort(unique(mean_std_data$Subject))
 return_data <- data.frame(matrix(ncol = ncol(mean_std_data), nrow = 0))
-#names(return_data) <- names(mean_std_data)
+names(return_data) <- names(mean_std_data)
 for(sub in subjects){
   sub_data<- mean_std_data[mean_std_data$Subject == sub,]
     for(item in activity){
@@ -70,4 +70,4 @@ for(sub in subjects){
       
     }
 }
-
+# export data
