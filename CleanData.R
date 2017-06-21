@@ -30,14 +30,14 @@ train_activity <- read.table("UCI HAR Dataset/train/y_train.txt")
 train_data <-cbind(train_sub, train_activity, train_data)
 all_data <- rbind(test_data, train_data)
 names(all_data) <- header
-activity_names <- as.data.frame(all_data$Activity, optional = FALSE)
+activity_names <- all_data$Activity
 for(i in seq(1, length(activity_names))){
     activity_names[i] <- activity[all_data$Activity[i]]
 }
-all_data$Activity <- data.frame(activity_names)
+all_data$Activity <- activity_names
 names(all_data[2]) <- header[2]
 #Subset data to only include  columns containing mean and standard deviation 
-sub_header <- c("Subject")
+sub_header <- c("Subject", "Activity")
 for(i in header){
   if(grepl("mean()", i) | grepl("std()", i)){
     sub_header <- c(sub_header, i)
@@ -46,4 +46,28 @@ for(i in header){
 mean_std_data <- all_data[,sub_header]
 
 
+
+#Renames variables
+
+
+#Average data for each activity and subject
+subjects <- sort(unique(mean_std_data$Subject))
+return_data <- data.frame(matrix(ncol = ncol(mean_std_data), nrow = 0))
+#names(return_data) <- names(mean_std_data)
+for(sub in subjects){
+  sub_data<- mean_std_data[mean_std_data$Subject == sub,]
+    for(item in activity){
+      act_data <- sub_data[sub_data$Activity == item,]
+      temp_data <- c(sub, item)
+      temp_row <- data.frame(matrix(ncol = ncol(mean_std_data), nrow = 0))
+      for (col in seq(3,ncol(act_data))){
+        new_mean <- mean(act_data[[col]], na.rm = TRUE)
+        temp_data <-c(temp_data, new_mean)
+      }
+      temp_row <- rbind(temp_row, temp_data)
+      names(temp_row) <- names(mean_std_data)
+      return_data <- rbind(return_data, temp_row)
+      
+    }
+}
 
