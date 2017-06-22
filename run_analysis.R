@@ -1,5 +1,3 @@
-setwd("~/R/CleanData/CleanData")
-wd <- getwd()
 #Checks for and download data in current working directory
 files <- list.files()
 if (!"UCI HAR Dataset" %in% files){
@@ -76,7 +74,7 @@ renamed <- c("Subject", "Activity")
 for(item in seq(3,length(sub_header))){
   
   if(grepl("-mean()", sub_header[item])){func <-"Mean of"
-  }else if(grepl("-std()", sub_header[item])){func <-"Standard Deviation of"
+  }else if(grepl("-std()", sub_header[item])){func <-"Standard Deviation of the"
   }else {func <-""}
   
   if(grepl("^t", sub_header[item])){
@@ -87,8 +85,8 @@ for(item in seq(3,length(sub_header))){
   }else if(grepl("Gyro", sub_header[item])){sensor <-"from the gyroscope"
   }else {sensor <-""}
   
-  if(grepl("Gravity", sub_header[item])){ movement <-"caused by Gravity"
-  }else if(grepl("Body", sub_header[item])){movement <-"caused by the Body"
+  if(grepl("Gravity", sub_header[item])){ movement <-"caused by gravity"
+  }else if(grepl("Body", sub_header[item])){movement <-"caused by the body"
   }else {movement <-""}
   
   if(grepl("-X", sub_header[item])){axis <-"on the X-axis"
@@ -96,11 +94,10 @@ for(item in seq(3,length(sub_header))){
   }else if(grepl("-Z", sub_header[item])){axis <-"on the Z-axis"
   }else {axis <-""}
   
-  renamed <-c(renamed, paste(func, signal, sensor, movement, axis, sep = " "))
+  renamed <-c(renamed, paste("Mean of:", func, signal, sensor, movement, axis, sep = " "))
 }
 sub_header <- renamed
 names(return_data) <- sub_header
-
 
 # export data
 write.table(return_data, "mean_results_by_subject.txt", row.names = FALSE)
