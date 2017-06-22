@@ -1,8 +1,8 @@
 setwd("~/R/CleanData/CleanData")
 wd <- getwd()
-#Check for and download data in current working directory
+#Checks for and download data in current working directory
 files <- list.files()
-if (!"RAW_Data.zip" %in% files){
+if (!"UCI HAR Dataset" %in% files){
   url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
   if (Sys.info()['sysname'] == "Windows"){
     method <- "wininet"
@@ -11,14 +11,12 @@ if (!"RAW_Data.zip" %in% files){
   unzip("RAW_Data.zip")
 }
 
-#Set headers and 
+#Set headers 
 header <- as.list(strsplit(readChar("UCI HAR Dataset/features.txt", file.info("UCI HAR Dataset/features.txt")$size), ' ')[[1]])
 header <- c("Subject", "Activity", header[2:length(header)])
 for(i in seq(1:length(header))){
   header[i] <- sub("\\n[0-9]*", '', header[i])
 }
-
-
 
 #Merges test and train data and assigns header
 test_data <- read.table("UCI HAR Dataset/test/X_test.txt")
@@ -44,16 +42,13 @@ names(all_data[2]) <- header[2]
 #Subset data to only include  columns containing mean and standard deviation 
 sub_header <- c("Subject", "Activity")
 for(i in header){
-  if(grepl("mean()", i) | grepl("std()", i)){
-    sub_header <- c(sub_header, i)
+  if(!grepl("meanFreq()", i)){
+    if(grepl("mean()", i) | grepl("std()", i)){
+      sub_header <- c(sub_header, i)
+    }
   }
 }
 mean_std_data <- all_data[,sub_header]
-
-
-
-#Renames variables
-
 
 #Average data for each activity and subject
 subjects <- sort(unique(mean_std_data$Subject))
@@ -75,5 +70,38 @@ for(sub in subjects){
       
     }
 }
+
+#Renames variables
+renamed <- c("Subject", "Activity")
+for(item in seq(3,length(sub_header))){
+  
+  if(grepl("-mean()", sub_header[item])){func <-"Mean of"
+  }else if(grepl("-std()", sub_header[item])){func <-"Standard Deviation of"
+  }else {func <-""}
+  
+  if(grepl("^t", sub_header[item])){
+    signal <- "time domain signal"
+  }else{signal <- "frequency domain signal"}
+  
+  if(grepl("Acc", sub_header[item])){ sensor <-"from the accelerometer"
+  }else if(grepl("Gyro", sub_header[item])){sensor <-"from the gyroscope"
+  }else {sensor <-""}
+  
+  if(grepl("Gravity", sub_header[item])){ movement <-"caused by Gravity"
+  }else if(grepl("Body", sub_header[item])){movement <-"caused by the Body"
+  }else {movement <-""}
+  
+  if(grepl("-X", sub_header[item])){axis <-"on the X-axis"
+  }else if(grepl("-Y", sub_header[item])){axis <-"on the Y-axis"
+  }else if(grepl("-Z", sub_header[item])){axis <-"on the Z-axis"
+  }else {axis <-""}
+  
+  renamed <-c(renamed, paste(func, signal, sensor, movement, axis, sep = " "))
+}
+sub_header <- renamed
+names(return_data) <- sub_header
+
+
 # export data
-write.table(return_data, "mean_results_by_subject.txt")
+write.table(return_data, "mean_results_by_subject.txt", row.names = FALSE)
+
