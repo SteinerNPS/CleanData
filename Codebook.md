@@ -10,6 +10,7 @@
     "SITTING"
     "STANDING"
     "LAYING" 
+
 [3]-[68] Mean of subject/activity data
   Mean calculations for all measurements from the subject and activity data that underwent the mean() and std() functions in the original dataset.
     "Mean of time domain signal from the accelerometer caused by the Body on the X-axis"                   
