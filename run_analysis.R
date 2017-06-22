@@ -8,8 +8,9 @@ if (!"RAW_Data.zip" %in% files){
     method <- "wininet"
   }else{method <- "curl"}
   download.file(url, "RAW_Data.zip", method)
+  unzip("RAW_Data.zip")
 }
-unzip("RAW_Data.zip")
+
 #Set headers and 
 header <- as.list(strsplit(readChar("UCI HAR Dataset/features.txt", file.info("UCI HAR Dataset/features.txt")$size), ' ')[[1]])
 header <- c("Subject", "Activity", header[2:length(header)])
@@ -17,7 +18,7 @@ for(i in seq(1:length(header))){
   header[i] <- sub("\\n[0-9]*", '', header[i])
 }
 
-activity <- c("WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS", "SITTING", "STANDING", "LAYING")
+
 
 #Merges test and train data and assigns header
 test_data <- read.table("UCI HAR Dataset/test/X_test.txt")
@@ -30,12 +31,16 @@ train_activity <- read.table("UCI HAR Dataset/train/y_train.txt")
 train_data <-cbind(train_sub, train_activity, train_data)
 all_data <- rbind(test_data, train_data)
 names(all_data) <- header
+
+#Switch activity code to names
+activity <- c("WALKING", "WALKING_UPSTAIRS", "WALKING_DOWNSTAIRS", "SITTING", "STANDING", "LAYING")
 activity_names <- all_data$Activity
 for(i in seq(1, length(activity_names))){
     activity_names[i] <- activity[all_data$Activity[i]]
 }
 all_data$Activity <- activity_names
 names(all_data[2]) <- header[2]
+
 #Subset data to only include  columns containing mean and standard deviation 
 sub_header <- c("Subject", "Activity")
 for(i in header){
